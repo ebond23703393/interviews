@@ -116,10 +116,10 @@ See our paper for more details about how the individual parts of the AI intervie
 
 
 import os
+from dotenv import load_dotenv
 
-# Either export environment variable OPENAI_API_KEY or modify the line below
-# directly, e.g. by changing it to `OPENAI_API_KEY = "MY_OPENAI_API_KEY"`
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "ADD_YOUR_OPENAI_API_KEY_HERE_AS_A_STRING_VARIABLE") 
+load_dotenv()  # This reads from the .env file
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 
 INTERVIEW_PARAMETERS = {
