@@ -1,6 +1,14 @@
 from datetime import datetime
 import logging
+import random
 
+programmes = [
+    ("Conditional Cash Transfers (CCTs)", "These provide money..."),
+    ("Unconditional Cash Transfers (UCTs)", "These give money..."),
+    ("Public Works Programmes", "These offer temporary employment..."),
+    ("In-Kind Transfers", "Recipients receive goods..."),
+    ("School Feeding Programmes", "These provide free meals...")
+]
 
 class InterviewManager(object):
     """
@@ -15,6 +23,8 @@ class InterviewManager(object):
         self.client = client
         self.session_id = session_id
     
+
+
     def begin_session(self, parameters:dict):
         """ Set starting interview session variables. """
         logging.info(f"Starting new session '{self.session_id}'")

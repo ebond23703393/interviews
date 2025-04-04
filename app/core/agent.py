@@ -3,7 +3,8 @@ import random
 from core.auxiliary import (
     execute_queries, 
     fill_prompt_with_interview, 
-    chat_to_string
+    chat_to_string,
+    get_randomised_programmes
 )
 from io import BytesIO
 from base64 import b64decode
@@ -111,13 +112,29 @@ class LLMAgent(object):
         next_topic = interview_plan[current_topic_idx]  # No -1 because we're transitioning TO it
         favourite = state.get("favourite_programme", "").lower()
 
-        if "scripted_messages" in next_topic:
-        # Filter out any message that contains the favourite
+        # Dynamic scripting: handle programme explanation
+        if next_topic.get("dynamic_script") == "explain_programmes":
+            logging.info("Generating dynamic programme explanation script.")
+            programmes, programme_map = get_randomised_programmes()
+            # Save mapping to state for later reference
+            state["programme_map"] = programme_map
+
+            # Construct scripted message from programme list
+            scripted_message = "Let me explain five common types of social assistance programmes:\n\n"
+            for idx, (name, desc) in enumerate(programmes, start=1):
+                scripted_message += f"{idx}. {name} - {desc}\n\n"
+            scripted_message += "Let me know if you'd like me to repeat or clarify any of these. Type ok if you don't need any further explanation."
+            logging.info("Using dynamically scripted_message.")
+            return scripted_message, state.get("summary", "")
+
+
+        if "programme_info_treatment" in next_topic:
+        # Filter out any message that contains the favourite programme
             filtered_messages = [
-            msg for msg in next_topic["scripted_messages"]
+            msg for msg in next_topic["programme_info_treatment"]
             if favourite not in msg.lower()
             ]
-            chosen = random.choice(filtered_messages) if filtered_messages else random.choice(next_topic["scripted_messages"])
+            chosen = random.choice(filtered_messages) if filtered_messages else random.choice(next_topic["programme_info_treatment"])
             logging.info(f"Randomized evidence message (≠ favourite): {chosen}")
             return chosen, state.get("summary", "")
 

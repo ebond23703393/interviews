@@ -281,7 +281,9 @@ INTERVIEW_PARAMETERS = {
 		"_name": "social_assistance",
 		"_description": "interview structure to elicite opinions on social assistence programmes",
         # SIMULATED RESPONDENT
-        "simulated_persona": "You are a working-class woman living in a rural area with very little knowledge of social assistance programmes.",
+        "simulated_persona": """
+        You a poor receipient worker in a public works programme. Keep any responses to a max of 100 words. You must respond exactly to the question being asked. "
+		You have very little knowledge, and so feel free to ask questions about transfer programmes if you aren't sure. Speak in a laid back tone. If told to respond with a number, you must respond only with a single number""",
 		# OPTIONAL FEATURES:
 		"moderate_answers": True,
 		"moderate_questions": True,
@@ -296,23 +298,11 @@ INTERVIEW_PARAMETERS = {
 			},
             
 			{
-				"topic": "Explain the types of social assistance",
-				"length": 1,
-				"scripted_message": """
-					Let me explain five common types of social assistance programmes:
-
-					1. Conditional Cash Transfers (CCTs) - These provide money to poor families, but only if they meet certain conditions, such as sending their children to school or getting regular health checkups.
-
-					2. Unconditional Cash Transfers (UCTs) - These give money to people without any conditions. Recipients can decide how to use the funds themselves.
-
-					3. Public Works Programmes - These offer temporary employment in infrastructure or community projects. People receive wages in exchange for their labor.
-
-					4. In-Kind Transfers - Instead of money, recipients receive goods like food, clothing, or hygiene products.
-
-					5. School Feeding Programmes - These provide free meals to children at school to improve attendance and nutrition.
-
-					Let me know if you'd like me to repeat or clarify any of these.
-					"""
+				"topic": "Explain the types of social assistance.",
+				"length":1,
+				"dynamic_script": "explain_programmes"
+					
+					
 			},
             
             {
@@ -322,7 +312,7 @@ INTERVIEW_PARAMETERS = {
 			},
             
             {
-				"topic": "Explore why they chose the specific programme as the one they support the most. What features of it appeal to them?",
+				"topic": "Start with: 'You selected [full name of selected social assistance programme]'. Explore why they chose the specific programme as the one they support the most. What features of it appeal to them?",
 				"length":2
 			},
             
@@ -330,17 +320,17 @@ INTERVIEW_PARAMETERS = {
 				"topic": "Randomly choose a programme that is DIFFERENT to the one that they selected as their favourite. Provide evidence based information regarding how effective this type of programme is in terms of how well it alleviates poverty.",
 				"length":1,
                 
-                "scripted_messages": 
-					["conditional cash transfers: the evidence is that educational conditions increased school attendence by 10%. What are your initial thoughts on this?", 
-					"unconditional cash transfers: the evidence is that the poor spend the transfers on productive assets and incomes increase by 10%. What are your initial thoughts on this?", 
-					"public works: the evidence is that recipients are 10% more likely to find a job in the next 6 months. What are your initial thoughts on this?",
-					"in-kind transfers: the evidence is that hunger dropped by 10% in a high inflation scenario. What are your initial thoughts on this?",
-					"school feeding: the evidence is that hunger dropped and parents were more likely to send their kids to school. What are your initial thoughts on this?"]
+                "programme_info_treatment": # Replace with evidence from Banerjee Handbook. These are randomised but ensure that the interviewee's favourite is not selected.
+					["Regarding conditional cash transfers, the evidence is that educational conditions increased school attendence by 10%. What are your initial thoughts on this?", 
+					"Regarding unconditional cash transfers, the evidence is that the poor spend the transfers on productive assets and incomes increase by 10%. What are your initial thoughts on this?", 
+					"Regarding public works the evidence is that recipients are 10% more likely to find a job in the next 6 months. What are your initial thoughts on this?",
+					"Regarding in-kind transfers the evidence is that hunger dropped by 10% in a high inflation scenario. What are your initial thoughts on this?",
+					"Regarding school feeding, the evidence is that hunger dropped and parents were more likely to send their kids to school. What are your initial thoughts on this?"]
 			},
             
 			{
 				"topic": "Ask the respondent again what their preferred social assistance programme is in light of the evidence, and why?",
-				"length":2
+				"length":4
 			},
 
 			# etc.

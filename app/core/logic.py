@@ -87,7 +87,8 @@ def next_question(session_id:str, interview_id:str, user_message:str=None) -> di
 
     # Capturing the interviewee's favourite programme
     if interview.get_current_topic() == 2:  # update if needed
-        favourite = extract_programme_choice(user_message)
+        programme_map = interview.current_state.get("programme_map", {})
+        favourite = extract_programme_choice(user_message, programme_map)
         if favourite:
             interview.current_state["favourite_programme"] = favourite.lower()
             logging.info(f"Stored favourite programme: {favourite}")
