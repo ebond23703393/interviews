@@ -3,6 +3,7 @@ import os
 from parameters import INTERVIEW_PARAMETERS, OPENAI_API_KEY
 from core.manager import InterviewManager
 from core.agent import LLMAgent
+from core.auxiliary import extract_programme_choice
 
 def connect_to_database():
     """ Instantiate specific backend database. """
@@ -83,6 +84,15 @@ def next_question(session_id:str, interview_id:str, user_message:str=None) -> di
     # Exit condition: this interview has been previously ended
     if interview.is_terminated():
         return {'session_id':session_id, 'message':parameters['termination_message']}
+
+    # Capturing the interviewee's favourite programme
+    if interview.get_current_topic() == 2:  # update if needed
+        programme_map = interview.current_state.get("programme_map", {})
+        favourite = extract_programme_choice(user_message, programme_map)
+        if favourite:
+            interview.current_state["favourite_programme"] = favourite.lower()
+            logging.info(f"Stored favourite programme: {favourite}")
+
 
     # Provide interview guidelines to LLM agent
     agent.load_parameters(parameters)

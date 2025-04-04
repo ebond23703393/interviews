@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 import time
 import logging 
+import random
 
 def chat_to_string(chat:list, only_topic:int=None, until_topic:int=None) -> str:
     """ Convert messages from chat into one string. """
@@ -62,3 +63,32 @@ def execute_queries(query, task_args:dict) -> dict:
     logging.info("OpenAI query took {:.2f} seconds".format(time.time() - st))
     logging.info(f"OpenAI query returned: {suggestions}")
     return suggestions
+
+
+
+def get_randomised_programmes():
+    programmes = [
+        ("Conditional Cash Transfers (CCTs)", "These provide money to poor families, but only if they meet certain conditions, such as sending their children to school or getting regular health checkups."),
+
+        ("Unconditional Cash Transfers (UCTs)", "These give money to people without any conditions. Recipients can decide how to use the funds themselves."),
+
+        ("Public Works Programmes" , "These offer temporary employment in infrastructure or community projects. People receive wages in exchange for their labor."),
+
+        ("In-Kind Transfers", "Instead of money, recipients receive goods like food, clothing, or hygiene products."),
+
+        ("School Feeding Programmes", "These provide free meals to children at school to improve attendance and nutrition.")
+    ]
+    random.shuffle(programmes)
+    programme_map = {i + 1: programmes[i][0] for i in range(len(programmes))}
+    return programmes, programme_map
+
+def extract_programme_choice(user_input: str, programme_map) -> str | None:
+    """
+    Extract a number 1–5 from user input and return the corresponding programme name.
+    Returns None if no valid match is found.
+    """
+    match = re.search(r"\b[1-5]\b", user_input)
+    if match:
+        number = match.group()
+        return programme_map.get(number)
+    return None
