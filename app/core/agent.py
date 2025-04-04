@@ -1,4 +1,5 @@
 import logging
+import random
 from core.auxiliary import (
     execute_queries, 
     fill_prompt_with_interview, 
@@ -72,20 +73,61 @@ class LLMAgent(object):
         
     def probe_within_topic(self, history:list) -> str:
         """ Return next 'within-topic' probing question. """
+
+        # Get current topic from parameters
+        state = history[-1]
+        topic_idx = int(state.get('topic_idx', 1)) - 1  # 0-based
+        current_topic = self.parameters['interview_plan'][topic_idx - 1]
+
+        # Randomly use scripted follow-up if defined
+        if "scripted_followups" in current_topic:
+            logging.info("Using randomized scripted follow-up question.")
+            return random.choice(current_topic["scripted_followups"])
+
+
         response = execute_queries(
             self.client.chat.completions.create,
             self.construct_query(['probe'], history)
         )
         return response['probe']
 
-    def transition_topic(self, history:list) -> tuple[str, str]:
+    def transition_topic(self, history: list) -> tuple[str, str]:
         """ 
         Determine next interview question transition from one topic
-        cluster to the next. If have defined `summarize` model in parameters
-        will also get summarization of interview thus far.
+        cluster to the next. If `scripted_message` exists in the next topic,
+        return that instead of an LLM-generated transition.
         """
+        # Get the current topic index from the latest state
+        state = history[-1]
+        current_topic_idx = int(state.get('topic_idx', 1))
+        interview_plan = self.parameters['interview_plan']
+
+        # Prevent out-of-bounds errors
+        if current_topic_idx >= len(interview_plan):
+            logging.warning("Already at final topic — no next topic to transition to.")
+            return "We've reached the end of the planned topics.", state.get("summary", "")
+
+        # Look ahead to the next topic
+        next_topic = interview_plan[current_topic_idx]  # No -1 because we're transitioning TO it
+        favourite = state.get("favourite_programme", "").lower()
+
+        if "scripted_messages" in next_topic:
+        # Filter out any message that contains the favourite
+            filtered_messages = [
+            msg for msg in next_topic["scripted_messages"]
+            if favourite not in msg.lower()
+            ]
+            chosen = random.choice(filtered_messages) if filtered_messages else random.choice(next_topic["scripted_messages"])
+            logging.info(f"Randomized evidence message (≠ favourite): {chosen}")
+            return chosen, state.get("summary", "")
+
+        if "scripted_message" in next_topic:
+            logging.info("Using single scripted_message.")
+            return next_topic["scripted_message"], state.get("summary", "")
+
+        # Otherwise, use the LLM to generate transition (and summary if needed)
         summarize = self.parameters.get('summarize')
-        tasks = ['summary','transition'] if summarize else ['transition']
+        tasks = ['summary', 'transition'] if summarize else ['transition']
         response = execute_queries(
             self.client.chat.completions.create,
             self.construct_query(tasks, history)

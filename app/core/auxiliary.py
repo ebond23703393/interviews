@@ -62,3 +62,22 @@ def execute_queries(query, task_args:dict) -> dict:
     logging.info("OpenAI query took {:.2f} seconds".format(time.time() - st))
     logging.info(f"OpenAI query returned: {suggestions}")
     return suggestions
+
+PROGRAMME_MAP = {
+    "1": "conditional cash transfers",
+    "2": "unconditional cash transfers",
+    "3": "public works",
+    "4": "in-kind transfers",
+    "5": "school feeding"
+}
+
+def extract_programme_choice(user_input: str) -> str | None:
+    """
+    Extract a number 1–5 from user input and return the corresponding programme name.
+    Returns None if no valid match is found.
+    """
+    match = re.search(r"\b[1-5]\b", user_input)
+    if match:
+        number = match.group()
+        return PROGRAMME_MAP.get(number)
+    return None
