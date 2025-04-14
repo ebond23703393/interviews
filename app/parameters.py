@@ -280,10 +280,6 @@ INTERVIEW_PARAMETERS = {
 		# META DATA (OPTIONAL):
 		"_name": "social_assistance",
 		"_description": "interview structure to elicite opinions on social assistence programmes",
-        # SIMULATED RESPONDENT
-        "simulated_persona": """
-        You a poor receipient worker in a public works programme. Keep any responses to a max of 100 words. You must respond exactly to the question being asked. "
-		You have very little knowledge, and so feel free to ask questions about transfer programmes if you aren't sure. Speak in a laid back tone. If told to respond with a number, you must respond only with a single number""",
 		# OPTIONAL FEATURES:
 		"moderate_answers": True,
 		"moderate_questions": True,
@@ -319,13 +315,12 @@ INTERVIEW_PARAMETERS = {
 			{
 				"topic": "Randomly choose a programme that is DIFFERENT to the one that they selected as their favourite. Provide evidence based information regarding how effective this type of programme is in terms of how well it alleviates poverty.",
 				"length":1,
-                
                 "programme_info_treatment": # Replace with evidence from Banerjee Handbook. These are randomised but ensure that the interviewee's favourite is not selected.
-					["Regarding conditional cash transfers, the evidence is that educational conditions increased school attendence by 10%. What are your initial thoughts on this?", 
-					"Regarding unconditional cash transfers, the evidence is that the poor spend the transfers on productive assets and incomes increase by 10%. What are your initial thoughts on this?", 
-					"Regarding public works the evidence is that recipients are 10% more likely to find a job in the next 6 months. What are your initial thoughts on this?",
-					"Regarding in-kind transfers the evidence is that hunger dropped by 10% in a high inflation scenario. What are your initial thoughts on this?",
-					"Regarding school feeding, the evidence is that hunger dropped and parents were more likely to send their kids to school. What are your initial thoughts on this?"]
+					["Regarding Conditional Cash Transfers (CCTs), the evidence is that educational conditions increased school attendence by 10%. What are your initial thoughts on this?", 
+					"Regarding Unconditional Cash Transfers (UCTs), the evidence is that the poor spend the transfers on productive assets and incomes increase by 10%. What are your initial thoughts on this?", 
+					"Regarding Public Works programmes the evidence is that recipients are 10% more likely to find a job in the next 6 months. What are your initial thoughts on this?",
+					"Regarding In-Kind transfers the evidence is that hunger dropped by 10% in a high inflation scenario. What are your initial thoughts on this?",
+					"Regarding School Feeding programmes, the evidence is that hunger dropped and parents were more likely to send their kids to school. What are your initial thoughts on this?"]
 			},
             
 			{
