@@ -8,17 +8,27 @@ from core.manager import InterviewManager
 from core.agent import LLMAgent
 from core.sim_agent import SimulatedIntervieweeAgent
 from database.file import FileWriter
+from scripts.Clean_interview import clean_interview_output
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 
 # Pick your interview ID
 interview_id = "Social_Assistance"
-session_id = "SIM-001"
+session_id = "SIM-002-rich-uk"
+
+ # SIMULATED RESPONDENT
+simulated_persona =  """
+        You are a rich person in a rich European country where unconditional cash transfers are prevalent as part of government welfare. 
+        Keep any responses to a max of 100 words. 
+        You must respond exactly to the question being asked.
+		You have very little knowledge, and so feel free to ask 
+        questions about transfer programmes if you aren't sure.
+        Speak in an informal tone. If told to respond with a number,
+        you must respond only with a single number"""
 
 # Load config
 parameters = INTERVIEW_PARAMETERS[interview_id]
-simulated_persona = parameters.get("simulated_persona", "You are a generic interviewee.")
 
 # Instantiate agents
 db = FileWriter()
@@ -31,7 +41,7 @@ interviewer.load_parameters(parameters)
 sim_user = SimulatedIntervieweeAgent(api_key=OPENAI_API_KEY, persona_prompt=simulated_persona)
 
 interview.add_chat_to_session("What comes to mind when you think of the poorest in your country?", type="question")
-interview.add_chat_to_session("They are very lazy.", type="answer")
+interview.add_chat_to_session("They work really hard.", type="answer")
 
 # Start interview loop
 while not interview.is_terminated():
@@ -81,3 +91,6 @@ while not interview.is_terminated():
 # Save final session
 interview.update_session()
 logging.info("Simulated interview complete.")
+
+# Clean the output
+clean_interview_output(session_id=session_id)
