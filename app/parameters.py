@@ -304,7 +304,7 @@ INTERVIEW_PARAMETERS = {
             {
 				"topic": "Ask the respondent of the social assistance programmes described which programme do they support the most?",
 				"length":1,
-                "scripted_message": "Of these 5 programmes, please indicate which programme you prefer. Your response must be a single number from 1-5 corresponding to the programmes above"
+                "scripted_message_favourite_programme": "Of these 5 programmes, please indicate which programme you prefer. Your response must be a single number from 1-5 corresponding to the programmes above"
 			},
             
             {
