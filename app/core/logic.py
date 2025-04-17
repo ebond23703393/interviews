@@ -85,14 +85,6 @@ def next_question(session_id:str, interview_id:str, user_message:str=None) -> di
     if interview.is_terminated():
         return {'session_id':session_id, 'message':parameters['termination_message']}
 
-    # Capturing the interviewee's favourite programme
-    if interview.get_current_topic() == 2:  # update if needed
-        programme_map = interview.current_state.get("programme_map", {})
-        favourite = extract_programme_choice(user_message, programme_map)
-        if favourite:
-            interview.current_state["favourite_programme"] = favourite.lower()
-            logging.info(f"Stored favourite programme: {favourite}")
-
 
     # Provide interview guidelines to LLM agent
     agent.load_parameters(parameters)
@@ -119,7 +111,19 @@ def next_question(session_id:str, interview_id:str, user_message:str=None) -> di
     flagged messages are *not* added to interview history.
     """
     interview.add_chat_to_session(user_message, type="answer")
+    
+    current_topic = interview.get_current_topic()
+    topic_data = parameters['interview_plan'][current_topic - 1]
+    print(f"topic_data: {topic_data}")
 
+    if "scripted_message_favourite_programme" in topic_data:
+        programme_map = interview.current_state.get("programme_map", {})
+        print(f"Extracting favourite programme from user input: {user_message}")
+        print(f"Programme map: {programme_map}")
+        favourite = extract_programme_choice(user_message,programme_map)
+        print(favourite)
+        if favourite:
+            interview.current_state["favourite_programme"] = favourite
 
     ##### CONTINUE INTERVIEW BASED ON WORKFLOW #####
 

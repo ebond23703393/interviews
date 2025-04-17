@@ -4,11 +4,13 @@ from core.auxiliary import (
     execute_queries, 
     fill_prompt_with_interview, 
     chat_to_string,
-    get_randomised_programmes
+    get_randomised_programmes,
+    extract_programme_choice
 )
 from io import BytesIO
 from base64 import b64decode
 from openai import OpenAI
+from core.manager import InterviewManager
 
 
 class LLMAgent(object):
@@ -50,7 +52,7 @@ class LLMAgent(object):
                         user_message=user_message
                     )
                 }],
-                "model": self.parameters[task].get('model', 'gpt-4o-mini'),
+                "model": self.parameters[task].get('model', 'gpt-4o-mini'), #gpt-4o-mini 04-mini
                 "max_tokens": self.parameters[task].get('max_tokens', 300),
                 "temperature": self.parameters[task].get('temperature', 0)
             } for task in tasks
@@ -110,14 +112,13 @@ class LLMAgent(object):
 
         # Look ahead to the next topic
         next_topic = interview_plan[current_topic_idx]  # No -1 because we're transitioning TO it
-        favourite = state.get("favourite_programme", "").lower()
+    
 
         # Dynamic scripting: handle programme explanation
         if next_topic.get("dynamic_script") == "explain_programmes":
             logging.info("Generating dynamic programme explanation script.")
-            programmes, programme_map = get_randomised_programmes()
             # Save mapping to state for later reference
-            state["programme_map"] = programme_map
+            programmes = state["programmes"]
 
             # Construct scripted message from programme list
             scripted_message = "Let me explain five common types of social assistance programmes:\n\n"
@@ -128,19 +129,23 @@ class LLMAgent(object):
             return scripted_message, state.get("summary", "")
 
 
-        if "programme_info_treatment" in next_topic:
+        if "programme_info_treatment" in next_topic: 
+            favourite = state["favourite_programme"]
         # Filter out any message that contains the favourite programme
             filtered_messages = [
             msg for msg in next_topic["programme_info_treatment"]
-            if favourite not in msg.lower()
+            if favourite.lower() not in msg.lower()
             ]
             chosen = random.choice(filtered_messages) if filtered_messages else random.choice(next_topic["programme_info_treatment"])
-            logging.info(f"Randomized evidence message (≠ favourite): {chosen}")
+            print(f"Randomized evidence message (≠ favourite): {chosen}")
+            print(f"Favourite: {favourite}")
+            print(f"Filtering from: {[msg[:60] for msg in filtered_messages]}")
             return chosen, state.get("summary", "")
+            
 
-        if "scripted_message" in next_topic:
+        if "scripted_message_favourite_programme" in next_topic:
             logging.info("Using single scripted_message.")
-            return next_topic["scripted_message"], state.get("summary", "")
+            return next_topic["scripted_message_favourite_programme"], state.get("summary", "")
 
         # Otherwise, use the LLM to generate transition (and summary if needed)
         summarize = self.parameters.get('summarize')
