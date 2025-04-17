@@ -68,19 +68,31 @@ def execute_queries(query, task_args:dict) -> dict:
 
 def get_randomised_programmes():
     programmes = [
-        ("Conditional Cash Transfers (CCTs)", "These provide money to poor families, but only if they meet certain conditions, such as sending their children to school or getting regular health checkups."),
+        ("Conditional Cash Transfers (CCTs)", "These provide money to poor families, but only if they meet certain conditions, such as sending their children to school or getting regular health checkups.","CCT in depth explanation"),
 
-        ("Unconditional Cash Transfers (UCTs)", "These give money to people without any conditions. Recipients can decide how to use the funds themselves."),
+        ("Unconditional Cash Transfers (UCTs)", "These give money to people without any conditions. Recipients can decide how to use the funds themselves.", "UCT in depth explanation"),
 
-        ("Public Works Programmes" , "These offer temporary employment in infrastructure or community projects. People receive wages in exchange for their labor."),
+        ("Public Works Programmes" , "These offer temporary employment in infrastructure or community projects. People receive wages in exchange for their labor.", "PW in depth explanation"),
 
-        ("In-Kind Transfers", "Instead of money, recipients receive goods like food, clothing, or hygiene products."),
+        ("In-Kind Transfers", "Instead of money, recipients receive goods like food, clothing, or hygiene products.", "In kind in depth explanation"),
 
-        ("School Feeding Programmes", "These provide free meals to children at school to improve attendance and nutrition.")
+        ("School Feeding Programmes", "These provide free meals to children at school to improve attendance and nutrition.", "School feeding in depth explanation")
     ]
     random.shuffle(programmes)
     programme_map = {i + 1: programmes[i][0] for i in range(len(programmes))}
-    return programmes, programme_map
+    programme_description_map = {i + 1: programmes[i][2] for i in range(len(programmes))}
+    return programmes, programme_map, programme_description_map
+
+def extract_programme_choice(user_input: str, map) -> str | None:
+    """
+    Extract a number 1–5 from user input and return the corresponding programme name.
+    Returns None if no valid match is found.
+    """
+    match = re.search(r"\b[1-5]\b", user_input)
+    if match:
+        number = match.group()
+        return map.get(number)
+    return None
 
 def extract_programme_choice(user_input: str, programme_map) -> str | None:
     """

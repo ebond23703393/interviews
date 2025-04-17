@@ -74,24 +74,26 @@ class LLMAgent(object):
         )
         return response.to_dict()["results"][0]["flagged"]
         
-    def probe_within_topic(self, history:list) -> str:
+    def probe_within_topic(self, history:list, state) -> str:
         """ Return next 'within-topic' probing question. """
 
         # Get current topic from parameters
-        state = history[-1]
+        #state = history[-1]
         topic_idx = int(state.get('topic_idx', 1)) - 1  # 0-based
-        current_topic = self.parameters['interview_plan'][topic_idx - 1]
+        current_topic = self.parameters['interview_plan'][topic_idx]
+        print(f"current topic:{current_topic}")
+        programme_explanation = state.get("programme_explanation")
 
-        # Randomly use scripted follow-up if defined
-        if "scripted_followups" in current_topic:
-            logging.info("Using randomized scripted follow-up question.")
-            return random.choice(current_topic["scripted_followups"])
-
+        if "explain_programmes" in current_topic.values() and programme_explanation:
+            return f"{programme_explanation}. Do you have any further questions (type: explain [#]. E.g. explain 4)? Type ok if you have no further questions."
 
         response = execute_queries(
             self.client.chat.completions.create,
             self.construct_query(['probe'], history)
         )
+
+        # Randomly use scripted follow-up if defined
+        
         return response['probe']
 
     def transition_topic(self, history: list) -> tuple[str, str]:
@@ -122,9 +124,9 @@ class LLMAgent(object):
 
             # Construct scripted message from programme list
             scripted_message = "Let me explain five common types of social assistance programmes:\n\n"
-            for idx, (name, desc) in enumerate(programmes, start=1):
+            for idx, (name, desc,_) in enumerate(programmes, start=1):
                 scripted_message += f"{idx}. {name} - {desc}\n\n"
-            scripted_message += "Let me know if you'd like me to repeat or clarify any of these. Type ok if you don't need any further explanation."
+            scripted_message += "Let me know if you'd like me to repeat or clarify any of these by indicating which one. Your answer must by a numnber from 1 to 5 corresponding to the programmes above. Type ok if you don't need any further explanation."
             logging.info("Using dynamically scripted_message.")
             return scripted_message, state.get("summary", "")
 

@@ -116,6 +116,13 @@ def next_question(session_id:str, interview_id:str, user_message:str=None) -> di
     topic_data = parameters['interview_plan'][current_topic - 1]
     print(f"topic_data: {topic_data}")
 
+    if "explain_programmes" in topic_data.values():
+        programme_map = interview.current_state.get('programme_description_map', {})
+        programme_explanation = extract_programme_choice(user_message, programme_map)
+        if programme_explanation:
+            interview.current_state["programme_explanation"] = programme_explanation
+            print(f"Stored programme_explanation: {programme_explanation}")
+
     if "scripted_message_favourite_programme" in topic_data:
         programme_map = interview.current_state.get("programme_map", {})
         print(f"Extracting favourite programme from user input: {user_message}")
@@ -125,7 +132,17 @@ def next_question(session_id:str, interview_id:str, user_message:str=None) -> di
         if favourite:
             interview.current_state["favourite_programme"] = favourite
 
-    ##### CONTINUE INTERVIEW BASED ON WORKFLOW #####
+    if "explain_programmes" in topic_data.values() and user_message.strip().lower() in ["ok","ok.", "okay", "that's clear", "got it","no"]:
+        print("User confirmed understanding of programmes — skipping to next topic.")
+        print(f"user message: {user_message.strip().lower()}")
+        next_question, summary = agent.transition_topic(interview.get_history())
+        interview.update_transition(summary)
+        interview.add_chat_to_session(next_question, type="question")
+        return {'session_id': session_id, 'message': next_question}
+        
+    """
+    CONTINUE INTERVIEW BASED ON WORKFLOW
+    """
 
     # Current topic guide
     num_topics = len(parameters['interview_plan'])
@@ -157,7 +174,7 @@ def next_question(session_id:str, interview_id:str, user_message:str=None) -> di
 
     else:
         # Proceed *within* topic...
-        next_question = agent.probe_within_topic(interview.get_history())
+        next_question = agent.probe_within_topic(interview.get_history(),interview.current_state)
         interview.update_probe()
 
     # Update interview with new output

@@ -28,7 +28,7 @@ class InterviewManager(object):
     def begin_session(self, parameters:dict):
         """ Set starting interview session variables. """
         logging.info(f"Starting new session '{self.session_id}'")
-        programmes, programme_map = get_randomised_programmes()
+        programmes, programme_map, programme_description_map = get_randomised_programmes()
 
         self.history = []           # List of 'states', i.e. messages
         self.current_state = {
@@ -43,7 +43,8 @@ class InterviewManager(object):
             'type': 'question',                 # question or answer
             'content': None,                    # content
             'programmes':programmes,
-            'programme_map': programme_map
+            'programme_map': programme_map,
+            'programme_description_map':programme_description_map
         }
         self.parameters = parameters
 
