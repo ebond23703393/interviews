@@ -1,15 +1,17 @@
 import os
 import os
 from dotenv import load_dotenv
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.chains import RetrievalQA
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.prompts import PromptTemplate
+
 
 # --- Constants ---
 PDF_DIR = "app\static"  # Adjust path if needed
+INDEX_DIR = os.path.join("app", "static", "faiss_index")
 PDF_FILES = ["Handbook Volume 1.pdf", "Handbook Volume 2.pdf"]  # Your documents
 CHUNK_SIZE = 800  # Adjust chunk size as needed
 CHUNK_OVERLAP = 200
@@ -27,30 +29,50 @@ def load_documents():
         docs.extend(loader.load())
     return docs
 
-# --- Split into chunks ---
-def split_documents(documents):
-    splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
-    return splitter.split_documents(documents)
+def create_vectorstore():
+    """Split, embed, and save documents to FAISS index."""
+    print("Creating FAISS index from scratch...")
+    docs = load_documents()
+    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=200)
+    chunks = splitter.split_documents(docs)
 
-# --- Build FAISS DB ---
-def build_vectorstore(documents):
     embeddings = OpenAIEmbeddings()
-    return FAISS.from_documents(documents, embeddings)
+    db = FAISS.from_documents(chunks, embeddings)
+    db.save_local(INDEX_DIR)
+    return db
 
-# --- Set up the RAG chain (once) ---
-documents = load_documents()
-chunks = split_documents(documents)
-vectorstore = build_vectorstore(chunks)
-retriever = vectorstore.as_retriever()
+def get_vectorstore():
+    """Load FAISS vectorstore if exists, otherwise create it."""
+    embeddings = OpenAIEmbeddings()
+    if os.path.exists(INDEX_DIR):
+        return FAISS.load_local(INDEX_DIR, embeddings, allow_dangerous_deserialization=True)
+    return create_vectorstore()
 
-qa_chain = RetrievalQA.from_chain_type(
-    llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
-    chain_type="stuff",
-    retriever=retriever,
-    return_source_documents=True
-)
+def get_qa_chain():
+    """Return a RetrievalQA chain using the vectorstore."""
+    retriever = get_vectorstore().as_retriever(
+        search_type="similarity_score_threshold",
+        search_kwargs={"score_threshold": 0.6, "k": 5} 
+    )
 
-# --- Public function ---
-def get_rag_answer(query: str) -> str:
-    result = qa_chain.invoke({"query": query})
-    return result["result"]
+    # Custom prompt to reduce references to "the text"
+    prompt_template = PromptTemplate(
+        input_variables=["context", "question"],
+        template=(
+            "You are a helpful assistant answering questions based on a policy handbook."
+            " Use the context below to answer the question clearly and concisely."
+            " Do not mention 'the text' or that you're referencing any document."
+            " If the context is insufficient, say you don't have enough information.\n\n"
+            "Context:\n{context}\n\n"
+            "Question: {question}\n"
+            "Answer:"
+        )
+    )
+
+    return RetrievalQA.from_chain_type(
+        llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
+        chain_type="stuff",
+        retriever=retriever,
+        return_source_documents=True,
+        chain_type_kwargs={"prompt": prompt_template},
+    )
