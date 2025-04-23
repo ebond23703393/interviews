@@ -11,6 +11,7 @@ from io import BytesIO
 from base64 import b64decode
 from openai import OpenAI
 from core.manager import InterviewManager
+from core.rag import get_qa_chain
 
 
 class LLMAgent(object):
@@ -80,12 +81,30 @@ class LLMAgent(object):
         # Get current topic from parameters
         #state = history[-1]
         topic_idx = int(state.get('topic_idx', 1)) - 1  # 0-based
+        question_idx = int(state.get('question_idx', 1))
         current_topic = self.parameters['interview_plan'][topic_idx]
-        print(f"current topic:{current_topic}")
         programme_explanation = state.get("programme_explanation")
+        topic_length = current_topic.get("length", 1)
+        print(f"current topic:{current_topic} \n question_idx: {question_idx} \n topic_length: {topic_length}" )
 
+        # At the stage of the interview where the user is asking about the programmes, we need to check if the user has asked a question about the programme
         if "explain_programmes" in current_topic.values() and programme_explanation:
             return f"{programme_explanation}. Do you have any further questions (type: explain [#]. E.g. explain 4)? Type ok if you have no further questions."
+
+        # At the stage of the interview where the user can ask about the effectiveness of the programmes.
+        if "programme_effectiveness" in current_topic.values():
+             # Get the last user message from history
+            last_user_message = next((entry["content"] for entry in reversed(history) if entry["type"] == "answer"), None)
+            if last_user_message:
+                # Run query through RAG model
+                result = get_qa_chain().invoke({"query": last_user_message})
+               # Format sources
+                sources = "\n\n".join([f"**Source {i+1}:** {doc.page_content[:300]}..." for i, doc in enumerate(result["source_documents"])])
+            
+            if   topic_length - question_idx > 1:
+                return  f"{result['result']}\n\n Let me know if you have any other questions about the programmes."
+            else:
+                return f"{result['result']}\n\n We will now move on to the next topic. Type ok if you are ready to move on."
 
         response = execute_queries(
             self.client.chat.completions.create,
@@ -130,10 +149,13 @@ class LLMAgent(object):
             logging.info("Using dynamically scripted_message.")
             return scripted_message, state.get("summary", "")
 
-
-        if "programme_info_treatment" in next_topic: 
-            favourite = state["favourite_programme"]
-        # Filter out any message that contains the favourite programme
+        # Providing 
+        if next_topic.get("treatment") == "programme_effectiveness": 
+            scripted_message = "You will now have the chance to ask me questions about the different programmes. I will answer them to the best of my ability. Please ask me about any of the programmes listed above."
+            return scripted_message, state.get("summary", "")
+           
+        '''
+            # Filter out any message that contains the favourite programme
             filtered_messages = [
             msg for msg in next_topic["programme_info_treatment"]
             if favourite.lower() not in msg.lower()
@@ -143,6 +165,7 @@ class LLMAgent(object):
             print(f"Favourite: {favourite}")
             print(f"Filtering from: {[msg[:60] for msg in filtered_messages]}")
             return chosen, state.get("summary", "")
+        '''
             
 
         if "scripted_message_favourite_programme" in next_topic:
