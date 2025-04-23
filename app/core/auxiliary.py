@@ -68,15 +68,15 @@ def execute_queries(query, task_args:dict) -> dict:
 
 def get_randomised_programmes():
     programmes = [
-        ("Conditional Cash Transfers (CCTs)", "These provide money to poor families, but only if they meet certain conditions, such as sending their children to school or getting regular health checkups.","CCT in depth explanation"),
+        ("Conditional Cash Transfers (CCTs)", "These provide money to poor families, but only if they meet certain conditions, such as sending their children to school or getting regular health checkups.","These are cash payments given to low-income families, but only if they meet specific requirements, like sending their children to school or attending health checkups. The goal is to reduce poverty while also encouraging long-term improvements in education and health."),
 
-        ("Unconditional Cash Transfers (UCTs)", "These give money to people without any conditions. Recipients can decide how to use the funds themselves.", "UCT in depth explanation"),
+        ("Unconditional Cash Transfers (UCTs)", "These give money to people without any conditions. Recipients can decide how to use the funds themselves.", "UCTs provide money to people with no strings attached — recipients can use the funds however they choose. This approach trusts individuals to know their own needs best and is often faster and simpler to implement than conditional programmes."),
 
-        ("Public Works Programmes" , "These offer temporary employment in infrastructure or community projects. People receive wages in exchange for their labor.", "PW in depth explanation"),
+        ("Public Works Programmes" , "These offer temporary employment in infrastructure or community projects. People receive wages in exchange for their labor.", "Workfare programmes offer short-term jobs (like building roads or cleaning public spaces) to people who are unemployed or struggling financially, and pay them wages in return. The aim is to create both employment opportunities and community improvements at the same time."),
 
-        ("In-Kind Transfers", "Instead of money, recipients receive goods like food, clothing, or hygiene products.", "In kind in depth explanation"),
+        ("In-Kind Transfers", "Instead of money, recipients receive goods like food, clothing, or hygiene products.", "In-kind transfers are such that instead of giving money, governments or aid groups provide essential goods like food, clothing, or hygiene products. These are often used in emergencies or in areas where markets don’t work well or prices are too high."),
 
-        ("School Feeding Programmes", "These provide free meals to children at school to improve attendance and nutrition.", "School feeding in depth explanation")
+        ("School Feeding Programmes", "These provide free meals to children at school to improve attendance and nutrition.", "School feeding programmes provide free meals to children while they are at school, ensuring they’re well-nourished and more likely to attend and concentrate in class.")
     ]
     random.shuffle(programmes)
     programme_map = {i + 1: programmes[i][0] for i in range(len(programmes))}
