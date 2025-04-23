@@ -5,6 +5,7 @@ from core.manager import InterviewManager
 from core.agent import LLMAgent
 from core.auxiliary import extract_programme_choice
 
+
 def connect_to_database():
     """ Instantiate specific backend database. """
     if os.getenv("DATABASE") == "DYNAMODB":
