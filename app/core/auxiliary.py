@@ -68,7 +68,7 @@ def execute_queries(query, task_args:dict) -> dict:
 
 def get_randomised_programmes():
     programmes = [
-        ("Conditional Cash Transfers (CCTs)", "These provide money to poor families, but only if they meet certain conditions, such as sending their children to school or getting regular health checkups.","These are cash payments given to low-income families, but only if they meet specific requirements, like sending their children to school or attending health checkups. The goal is to reduce poverty while also encouraging long-term improvements in education and health."),
+        ("Conditional Cash Transfers (CCTs)", "These provide money to poor families, but only if they meet certain conditions, such as sending their children to school or getting regular health checkups.","CCTs are cash payments given to low-income families, but only if they meet specific requirements, like sending their children to school or attending health checkups. The goal is to reduce poverty while also encouraging long-term improvements in education and health."),
 
         ("Unconditional Cash Transfers (UCTs)", "These give money to people without any conditions. Recipients can decide how to use the funds themselves.", "UCTs provide money to people with no strings attached — recipients can use the funds however they choose. This approach trusts individuals to know their own needs best and is often faster and simpler to implement than conditional programmes."),
 
