@@ -164,19 +164,15 @@ INTERVIEW_PARAMETERS = {
 			},
             
 			{
-				"topic": "Randomly choose a programme that is DIFFERENT to the one that they selected as their favourite. Provide evidence based information regarding how effective this type of programme is in terms of how well it alleviates poverty.",
-				"length":1,
-                "programme_info_treatment": # Replace with evidence from Banerjee Handbook. These are randomised but ensure that the interviewee's favourite is not selected.
-					["Regarding Conditional Cash Transfers (CCTs), the evidence is that educational conditions increased school attendence by 10%. What are your initial thoughts on this?", 
-					"Regarding Unconditional Cash Transfers (UCTs), the evidence is that the poor spend the transfers on productive assets and incomes increase by 10%. What are your initial thoughts on this?", 
-					"Regarding Public Works programmes the evidence is that recipients are 10% more likely to find a job in the next 6 months. What are your initial thoughts on this?",
-					"Regarding In-Kind transfers the evidence is that hunger dropped by 10% in a high inflation scenario. What are your initial thoughts on this?",
-					"Regarding School Feeding programmes, the evidence is that hunger dropped and parents were more likely to send their kids to school. What are your initial thoughts on this?"]
+				"topic": "Converse with the interviewee about the effectiveness of the programme they selected.",
+				"length":4,
+                "treatment": "programme_effectiveness",
+					
 			},
             
 			{
 				"topic": "Ask the respondent again what their preferred social assistance programme is in light of the evidence, and why?",
-				"length":4
+				"length":1
 			},
 
 			# etc.
