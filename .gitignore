@@ -32,3 +32,6 @@ _old/
 data/
 .aws-sam/
 .env
+*.faiss
+*.pkl
+*.ipynb
