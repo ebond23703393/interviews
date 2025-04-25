@@ -18,7 +18,7 @@
         <!-- Footer: Contains optional instructions to the respondent and the submit button. Placed below the text input field.  -->
         <div style="display: flex; justify-content: flex-end; padding-top: 10px;" class="submit-button-container">
             <!-- Optional instructions. Leave empty if not needed. -->
-            <div style="flex-grow: 1; font-size: 18px; border: none; height: 30px; line-height: 1.2; padding-left: 10px; color: rgb(53, 53, 53);">Please write full sentences.</div>
+            <div style="flex-grow: 1; font-size: 18px; border: none; height: 30px; line-height: 1.2; padding-left: 10px; color: rgb(53, 53, 53);">Please respond to the best of your knowledge.</div>
             <!-- Record button: Respondents have to click this button to record a response. -->
             <button style="background-color: #D3D3D3; color: black; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 18px; transition: background-color 0.3s; margin-right: 10px;" id="recordButton">Record response</button>
             <!-- Submit button: Respondents have to click this button to submit a response. -->
@@ -34,9 +34,11 @@ var chatArea = document.getElementById("chatArea");
 var submitButton = document.getElementById("submitButton");
 var userInput = document.getElementById("inputBox")
 
+
 ////////////////////////////////
 //// START AUDIO INPUT CODE ////
 ////////////////////////////////    
+
 let mediaRecorder;
 let audioChunks = []; 
 let stream;
@@ -112,6 +114,7 @@ recordButton.addEventListener("click", async () => {
 
     }
 });
+
 ////////////////////////////////
 /// END OF AUDIO INPUT CODE ////
 ////////////////////////////////
