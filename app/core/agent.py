@@ -100,11 +100,13 @@ class LLMAgent(object):
                 result = get_qa_chain().invoke({"query": last_user_message})
                # Format sources
                 sources = "\n\n".join([f"**Source {i+1}:** {doc.page_content[:300]}..." for i, doc in enumerate(result["source_documents"])])
+                page_source = [(i.metadata["source"],i.metadata["page"]) for i in result["source_documents"]]
+                formatted_pages = "\n".join([f"Source: {source}, Page: {page}" for source, page in page_source])
             
             if   topic_length - question_idx > 1:
-                return  f"{result['result']}\n\n Let me know if you have any other questions about the programmes."
+                return  f"{result['result']}\n\n{formatted_pages})\n\n Let me know if you have any other questions about the programmes."
             else:
-                return f"{result['result']}\n\n We will now move on to the next topic. Type ok if you are ready to move on."
+                return  f"{result['result']}\n\n{formatted_pages})\n\n We will now move on to the next topic. Type ok if you are ready to move on."
 
         response = execute_queries(
             self.client.chat.completions.create,
