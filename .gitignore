@@ -25,9 +25,15 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+_old/
 
 ## Application 
 *.csv
 data/
 .aws-sam/
 .env
+*.faiss
+*.pkl
+*.ipynb
+test.py
+*app/static/*
