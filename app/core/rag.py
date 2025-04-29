@@ -12,7 +12,7 @@ from langchain.prompts import PromptTemplate
 # --- Constants ---
 PDF_DIR = "app\static"  # Adjust path if needed
 INDEX_DIR = os.path.join("app", "static", "faiss_index")
-PDF_FILES = ["Handbook Volume 1.pdf", "Handbook Volume 2.pdf"]  # Your documents
+PDF_FILES = ["Handbook Volume 1.pdf", "Handbook Volume 2.pdf", "ODI evidence of cash transfers.pdf"]  # Your documents
 CHUNK_SIZE = 800  # Adjust chunk size as needed
 CHUNK_OVERLAP = 200
 
