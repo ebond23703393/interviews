@@ -36,4 +36,3 @@ data/
 *.pkl
 *.ipynb
 test.py
-*app/static/*
