@@ -60,7 +60,7 @@ The cleanest way to then run the application -- locally or remotely -- is throug
 **Step 1**: Clone the project from GitHub and navigate into the repo:
 
 ```bash
-git clone https://github.com/fchop/interviews.git
+git clone https://github.com/ebond23703393/interviews.git
 cd interviews
 ```
 
@@ -96,13 +96,13 @@ cd interviews-env
 source bin/activate
 ```
 
-**Step 1:** Clone this project from Github and install the necessary packages defined in the repository's `local_requirements.txt` file using `pip`:
+**Step 1:** Clone this project from Github and install the necessary packages defined in the repository's `requirements.txt` file using `pip`:
 
 ```bash
-git clone https://github.com/fchop/interviews.git
+git clone https://github.com/ebond23703393/interviews.git
 cd interviews
 
-pip install -r local_requirements.txt
+pip install -r requirements.txt
 ```
 
 **Step 2:** Now start a *development* server to host your application by running:

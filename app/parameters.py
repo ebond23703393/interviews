@@ -141,12 +141,12 @@ INTERVIEW_PARAMETERS = {
 		"interview_plan": [
 			{
 				"topic":"Explore the perceptions that the interviewee has of poor people in their country and understand why they have these perceptions. Do not yet mention social assistance programmes.",
-				"length":4
+				"length":3
 			},
             
 			{
 				"topic":"Discuss with the interviewee whether they think that the poor can be helped out of poverty (poverty trap argument), or whether they are inherently lower productivity and will be stuck there for life.",
-				"length":4
+				"length":3
 			},
             
 			{
@@ -164,8 +164,9 @@ INTERVIEW_PARAMETERS = {
 			},
             
             {
-				"topic": "Start with: 'You selected [full name of selected social assistance programme]'. Explore why they chose the specific programme as the one they support the most. What features of it appeal to them?",
-				"length":3
+				"topic": "Start this topic inidicating which social assistance programme they choose. Explore why they chose the specific programme as the one they support the most. What features of it appeal to them?",
+				"length":3,
+                "dynamic_script": "Repeat programme choice"
 			},
             
 			{
