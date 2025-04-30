@@ -136,7 +136,7 @@ def next_question(session_id:str, interview_id:str, user_message:str=None) -> di
     if "explain_programmes" in topic_data.values() and user_message.strip().lower() in ["ok","ok.", "okay", "that's clear", "got it","no"]:
         print("User confirmed understanding of programmes — skipping to next topic.")
         print(f"user message: {user_message.strip().lower()}")
-        next_question, summary = agent.transition_topic(interview.get_history())
+        next_question, summary = agent.transition_topic(interview.get_history(), interview.current_state)
         interview.update_transition(summary)
         interview.add_chat_to_session(next_question, type="question")
         return {'session_id': session_id, 'message': next_question}
@@ -170,7 +170,8 @@ def next_question(session_id:str, interview_id:str, user_message:str=None) -> di
 
     elif on_last_question:
         # Transition to *next* topic...
-        next_question, summary = agent.transition_topic(interview.get_history())
+        print(f"Current State: {interview.current_state}")
+        next_question, summary = agent.transition_topic(interview.get_history(),interview.current_state)
         interview.update_transition(summary)
 
     else:

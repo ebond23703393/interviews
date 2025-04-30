@@ -117,7 +117,7 @@ class LLMAgent(object):
         
         return response['probe']
 
-    def transition_topic(self, history: list) -> tuple[str, str]:
+    def transition_topic(self, history: list, current_state) -> tuple[str, str]:
         """ 
         Determine next interview question transition from one topic
         cluster to the next. If `scripted_message` exists in the next topic,
@@ -127,6 +127,7 @@ class LLMAgent(object):
         state = history[-1]
         current_topic_idx = int(state.get('topic_idx', 1))
         interview_plan = self.parameters['interview_plan']
+        favourite = current_state.get("favourite_programme")
 
         # Prevent out-of-bounds errors
         if current_topic_idx >= len(interview_plan):
@@ -151,9 +152,13 @@ class LLMAgent(object):
             logging.info("Using dynamically scripted_message.")
             return scripted_message, state.get("summary", "")
 
-        # Providing 
+        # Treatment section
         if next_topic.get("treatment") == "programme_effectiveness": 
             scripted_message = "You will now have the chance to ask me questions about the different programmes. I will answer them to the best of my ability. Please ask me about any of the programmes listed above."
+            return scripted_message, state.get("summary", "")
+        
+        if next_topic.get("dynamic_script") == "Repeat programme choice": 
+            scripted_message = f"You have chosen the following programme: {favourite}. Is that correct?"
             return scripted_message, state.get("summary", "")
            
         '''
