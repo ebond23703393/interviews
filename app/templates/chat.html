@@ -61,7 +61,7 @@
             <div class="chat-header">Public Views on Social Assistance</div>
         
             <!-- Chat Area: The conversation history goes here. Contains questions and previously written responses. -->
-            <div style="overflow-y: scroll; height: calc(100% - 200px); margin-bottom: 5px; border: 2px solid #ece5dd; border-radius: 5px; padding: 10px; display: flex; flex-direction: column; align-items: flex-end;" id="chatArea">&nbsp;</div>
+            <div style="overflow-y: scroll; height: calc(100% - 200px); margin-bottom: 5px; border: 2px solid #ece5dd; border-radius: 5px; padding: 10px; display: flex; flex-direction: column; align-items: flex-end;" id="chatArea"></div>
         
             <!-- Text input field: Respondents write their responses in this container. It sits directly below the chat area. -->
             <div style="position: relative; margin-top: 5px;" class="input-container"><textarea style="width: 90%; resize: vertical; font-size: 18px; min-height: 150px; max-height: 150px; border: 4px solid #ece5dd; border-radius: 10px; padding: 10px; overflow: auto; margin-left: 10px;" placeholder="Type your message here..." maxlength="3000" id="inputBox"></textarea></div>
@@ -262,7 +262,8 @@ function submitUserMessage() {
             contentType: "application/json",
             dataType: "json",
             success: function (data) {
-                var next_question = data.message.trim();
+                var next_question = data.message ? data.message.trim() : "";
+                var image_url = data.image_url;
 
                 var endInterviewIndex = next_question.indexOf("---END---");
                 if (endInterviewIndex !== -1) {
@@ -276,8 +277,26 @@ function submitUserMessage() {
                     submitButton.style.backgroundColor = '#25d366';
                     recordButton.disabled = false;
                 }
+
+                // Append the message
                 appendChatbotMessage(next_question, chatArea, "response");
+
+                // Append image if one is provided
+                if (image_url) {
+                    var imageWrapper = document.createElement("div");
+                    imageWrapper.style.cssText = "width: 80%; margin-bottom: 10px; display: block; margin-right: auto; text-align: center;";
+
+                    var imageElement = document.createElement("img");
+                    imageElement.src = image_url;
+                    imageElement.alt = "Visual aid";
+                    imageElement.style.cssText = "max-width: 100%; max-height: 250px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);";
+
+                    imageWrapper.appendChild(imageElement);
+                    chatArea.appendChild(imageWrapper);
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }
             },
+
             error: function () {
                 appendChatbotMessage("There was a technical error. Please try again.", chatArea, "response");
                 submitButton.disabled = false;
