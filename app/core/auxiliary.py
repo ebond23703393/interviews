@@ -86,21 +86,30 @@ def get_randomised_programmes():
 def extract_programme_choice(user_input: str, map) -> str | None:
     """
     Extract a number 1–5 from user input and return the corresponding programme name.
+    Accepts either digit ("3") or word ("three").
     Returns None if no valid match is found.
     """
-    match = re.search(r"\b[1-5]\b", user_input)
-    if match:
-        number = match.group()
+    word_to_number = {
+        "one": "1",
+        "two": "2",
+        "three": "3",
+        "four": "4",
+        "five": "5"
+    }
+
+    # Normalize input to lowercase
+    normalized_input = user_input.lower()
+
+    # Try to match digit
+    digit_match = re.search(r"\b[1-5]\b", normalized_input)
+    if digit_match:
+        number = digit_match.group()
         return map.get(number)
+
+    # Try to match written word
+    for word, number in word_to_number.items():
+        if re.search(rf"\b{word}\b", normalized_input):
+            return map.get(number)
+
     return None
 
-def extract_programme_choice(user_input: str, programme_map) -> str | None:
-    """
-    Extract a number 1–5 from user input and return the corresponding programme name.
-    Returns None if no valid match is found.
-    """
-    match = re.search(r"\b[1-5]\b", user_input)
-    if match:
-        number = match.group()
-        return programme_map.get(number)
-    return None

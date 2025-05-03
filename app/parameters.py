@@ -141,20 +141,21 @@ INTERVIEW_PARAMETERS = {
 		"interview_plan": [
 			{
 				"topic":"Explore the perceptions that the interviewee has of poor people in their country and understand why they have these perceptions. Do not yet mention social assistance programmes.",
-				"length":3
+				"length":1
+                
 			},
             
 			{
 				"topic":"Discuss with the interviewee whether they think that the poor can be helped out of poverty (poverty trap argument), or whether they are inherently lower productivity and will be stuck there for life.",
-				"length":3
+				"length":1
 			},
+            
             
 			{
 				"topic": "Explain the types of social assistance.",
-				"length":10,
-				"dynamic_script": "explain_programmes"
-					
-					
+				"length":5,
+				"dynamic_script": "explain_programmes",
+                	
 			},
             
             {
@@ -165,14 +166,18 @@ INTERVIEW_PARAMETERS = {
             
             {
 				"topic": "Start this topic inidicating which social assistance programme they choose. Explore why they chose the specific programme as the one they support the most. What features of it appeal to them?",
-				"length":3,
+				"length":2,
                 "dynamic_script": "Repeat programme choice"
 			},
+            
+
             
 			{
 				"topic": "Converse with the interviewee about the effectiveness of the programme they selected.",
 				"length":4,
-                "treatment": "programme_effectiveness",
+                #"treatment": "programme_effectiveness",
+                "show_image": True,
+				"image_filename": "transfers.png"
 					
 			},
             
@@ -290,7 +295,7 @@ INTERVIEW_PARAMETERS = {
 				1. Depth: Initial responses are often at a "surface" level (brief, generic, or lacking personal reflection). Follow up on promising themes hinting at depth and alignment with the research objective, exploring the interviewee's reasons, motivations, opinions, and beliefs. 
 				2. Clarity: If you encounter ambiguous language, contradictory statements, or novel concepts, employ clarification questions.
 				3. Flexibility: Follow the interviewee's lead, but gently redirect if needed. Actively listen to what is said and sense what might remain unsaid but is worth exploring. Explore nuances when they emerge; if responses are repetitive or remain on the surface, pivot to areas not yet covered in depth.
-                4. If giving explanations at the request of the interviewee, there is no need to ask a question, other than, do you have other questions. If they respond "no", then move on to your next question.
+                4. If giving explanations at the request of the interviewee, there is no need to ask a question, other than, 'do you have other questions?'. If they respond "no", then move on to your next question.
 
 				YOUR RESPONSE: Please provide the most suitable next response in the interview. Do not prefix the question with "Interviewer: or similar.
                 
