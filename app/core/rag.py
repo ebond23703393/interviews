@@ -61,6 +61,8 @@ def get_qa_chain():
         template=(
             "You are a helpful assistant answering questions based on a policy handbook."
             " Use the context below to answer the question clearly and concisely."
+            " Simplify any complex language and avoid jargon."
+            " Talk in layman's terms and make it easy to understand."
             " Do not mention 'the text' or that you're referencing any document."
             " If the context is insufficient, say you don't have enough information.\n\n"
             "Context:\n{context}\n\n"
@@ -70,7 +72,7 @@ def get_qa_chain():
     )
 
     return RetrievalQA.from_chain_type(
-        llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
+        llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.5),
         chain_type="stuff",
         retriever=retriever,
         return_source_documents=True,

@@ -1,7 +1,7 @@
 import json
 
 
-def clean_interview_output(session_id="SIM-001", folder_path="C:/Users/edward_b/github/interviews-env/interviews/app/data"):
+def clean_interview_output(session_id, folder_path="C:/Users/edward_b/github/interviews/interviews/app/data"):
     json_path = f"{folder_path}/{session_id}.json"
     txt_path = f"{folder_path}/{session_id}_clean.txt"
 

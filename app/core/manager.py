@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 import random
 from core.auxiliary import get_randomised_programmes
+from core.AVA import get_llm_response
 
 programmes = [
     ("Conditional Cash Transfers (CCTs)", "These provide money..."),
@@ -87,6 +88,7 @@ class InterviewManager(object):
         self.history.append(self.current_state.copy())
         self.client.update_remote_session(self.session_id, self.history)
 
+
     def terminate(self, reason:str="end_of_interview"):
         """ Record termination of interview. """
         self.current_state["terminated"] = True
@@ -130,8 +132,8 @@ class InterviewManager(object):
 
         if self.parameters.get('summary'):
             self.update_summary(summary)
-        
 
+        
 
     def update_closing(self):
         self.current_state["question_idx"] = 99  
@@ -146,3 +148,13 @@ class InterviewManager(object):
         self.history[-1] = self.current_state
         self.client.update_remote_session(self.session_id, self.history)
    
+    @staticmethod
+    def ask_ava(user_message: str) -> str:
+        """
+        Send a question to the AVA LLM and return its response.
+        """
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant knowledgeable about evidence on poverty programs. Be very brief in your response."},
+            {"role": "user", "content": user_message}
+        ]
+        return get_llm_response(messages)
