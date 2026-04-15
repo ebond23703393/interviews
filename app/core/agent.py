@@ -12,6 +12,18 @@ from base64 import b64decode
 from openai import OpenAI
 from core.manager import InterviewManager
 from core.rag import get_qa_chain
+try:
+    from flask import url_for, has_app_context
+except ImportError:
+    # If Flask is not available
+    def url_for(*args, **kwargs):
+        return None
+    def has_app_context():
+        return False
+import time 
+
+
+
 
 
 class LLMAgent(object):
@@ -85,7 +97,6 @@ class LLMAgent(object):
         current_topic = self.parameters['interview_plan'][topic_idx]
         programme_explanation = state.get("programme_explanation")
         topic_length = current_topic.get("length", 1)
-        print(f"current topic:{current_topic} \n question_idx: {question_idx} \n topic_length: {topic_length}" )
 
         # At the stage of the interview where the user is asking about the programmes, we need to check if the user has asked a question about the programme
         if "explain_programmes" in current_topic.values() and programme_explanation:
@@ -108,6 +119,14 @@ class LLMAgent(object):
             else:
                 return  f"{result['result']}\n\n{formatted_pages})\n\n We will now move on to the next topic. Type ok if you are ready to move on."
 
+        #Invoking WB AVA tool
+        if "Talk with AVA" in current_topic.values():
+            last_user_message = next((entry["content"] for entry in reversed(history) if entry["type"] == "answer"), None)
+            if last_user_message:
+                ava_response = InterviewManager.ask_ava(last_user_message)
+                return ava_response
+
+
         response = execute_queries(
             self.client.chat.completions.create,
             self.construct_query(['probe'], history)
@@ -117,13 +136,11 @@ class LLMAgent(object):
         
         return response['probe']
 
-    def transition_topic(self, history: list, current_state) -> tuple[str, str]:
-        """ 
-        Determine next interview question transition from one topic
-        cluster to the next. If `scripted_message` exists in the next topic,
-        return that instead of an LLM-generated transition.
+    def transition_topic(self, history: list, current_state) -> tuple[str | dict, str]:
         """
-        # Get the current topic index from the latest state
+        Determine the next interview question or message when transitioning topics.
+        Supports image-only topics by returning a dict with 'text' and 'image_url'.
+        """
         state = history[-1]
         current_topic_idx = int(state.get('topic_idx', 1))
         interview_plan = self.parameters['interview_plan']
@@ -135,55 +152,68 @@ class LLMAgent(object):
             return "We've reached the end of the planned topics.", state.get("summary", "")
 
         # Look ahead to the next topic
-        next_topic = interview_plan[current_topic_idx]  # No -1 because we're transitioning TO it
-    
+        next_topic = interview_plan[current_topic_idx]  # no -1; we're transitioning TO this topic
+        current_topic = interview_plan[current_topic_idx - 1]
+
+        # Handle image-only topics
+        if next_topic.get("type") == "image_only":
+            logging.info("Handling image-only topic transition.")
+            image_filename = next_topic.get("image_filename", "default.png")
+            
+            # Only use url_for if we're in a Flask application context
+            if has_app_context():
+                image_url = url_for('static', filename=f'images/{image_filename}')
+            else:
+                # For simulated interviews, just use the filename or path
+                image_url = f'/static/images/{image_filename}'
+            
+            return {
+                "text": "Please take a moment to review this visual before we continue.",
+                "image_url": image_url
+            }, state.get("summary", "")
+        
+        # handle AVA
+        if next_topic.get("topic") == "Talk with AVA":
+            return "You will now have the chance to talk with AVA, our virtual assistant. Please ask any questions you have about the programmes.", state.get("summary", "")
 
         # Dynamic scripting: handle programme explanation
         if next_topic.get("dynamic_script") == "explain_programmes":
             logging.info("Generating dynamic programme explanation script.")
-            # Save mapping to state for later reference
             programmes = state["programmes"]
 
-            # Construct scripted message from programme list
             scripted_message = "Let me explain five common types of social assistance programmes:\n\n"
-            for idx, (name, desc,_) in enumerate(programmes, start=1):
+            for idx, (name, desc, _) in enumerate(programmes, start=1):
                 scripted_message += f"{idx}. {name} - {desc}\n\n"
-            scripted_message += "Let me know if you'd like me to repeat or clarify any of these by indicating which one. Your answer must by a numnber from 1 to 5 corresponding to the programmes above. Type ok if you don't need any further explanation."
-            logging.info("Using dynamically scripted_message.")
+            scripted_message += (
+                "Let me know if you'd like me to repeat or clarify any of these by indicating which one. "
+                "Your answer must be a number from 1 to 5 corresponding to the programmes above. "
+                "Type ok if you don't need any further explanation."
+            )
+            time.sleep(2)
             return scripted_message, state.get("summary", "")
 
-        # Treatment section
-        if next_topic.get("treatment") == "programme_effectiveness": 
-            scripted_message = "You will now have the chance to ask me questions about the different programmes. I will answer them to the best of my ability. Please ask me about any of the programmes listed above."
-            return scripted_message, state.get("summary", "")
-        
-        if next_topic.get("dynamic_script") == "Repeat programme choice": 
-            scripted_message = f"You have chosen the following programme: {favourite}. Is that correct?"
-            return scripted_message, state.get("summary", "")
-           
-        '''
-            # Filter out any message that contains the favourite programme
-            filtered_messages = [
-            msg for msg in next_topic["programme_info_treatment"]
-            if favourite.lower() not in msg.lower()
-            ]
-            chosen = random.choice(filtered_messages) if filtered_messages else random.choice(next_topic["programme_info_treatment"])
-            print(f"Randomized evidence message (≠ favourite): {chosen}")
-            print(f"Favourite: {favourite}")
-            print(f"Filtering from: {[msg[:60] for msg in filtered_messages]}")
-            return chosen, state.get("summary", "")
-        '''
-            
+        # Pre-scripted treatment message
+        if next_topic.get("treatment") == "programme_effectiveness":
+            return (
+                "You will now have the chance to ask me questions about the different programmes. "
+                "I will answer them to the best of my ability. Please ask me about any of the programmes listed above.",
+                state.get("summary", "")
+            )
+
+        if next_topic.get("dynamic_script") == "Repeat programme choice":
+            return (
+                f"You have chosen the following programme: {favourite}. Is that correct?",
+                state.get("summary", "")
+            )
 
         if "scripted_message_favourite_programme" in next_topic:
-            logging.info("Using single scripted_message.")
             return next_topic["scripted_message_favourite_programme"], state.get("summary", "")
 
-        # Otherwise, use the LLM to generate transition (and summary if needed)
-        summarize = self.parameters.get('summarize')
-        tasks = ['summary', 'transition'] if summarize else ['transition']
+        # Otherwise use LLM
+        summarize = self.parameters.get("summarize")
+        tasks = ["summary", "transition"] if summarize else ["transition"]
         response = execute_queries(
             self.client.chat.completions.create,
             self.construct_query(tasks, history)
         )
-        return response['transition'], response.get('summary', '')
+        return response["transition"], response.get("summary", "")

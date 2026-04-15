@@ -65,7 +65,6 @@ def execute_queries(query, task_args:dict) -> dict:
     return suggestions
 
 
-
 def get_randomised_programmes():
     programmes = [
         ("Conditional Cash Transfers (CCTs)", "These provide money to poor families, but only if they meet certain conditions, such as sending their children to school or getting regular health checkups.","CCTs are cash payments given to low-income families, but only if they meet specific requirements, like sending their children to school or attending health checkups. The goal is to reduce poverty while also encouraging long-term improvements in education and health."),
@@ -89,6 +88,7 @@ def extract_programme_choice(user_input: str, map) -> str | None:
     Accepts either digit ("3") or word ("three").
     Returns None if no valid match is found.
     """
+
     word_to_number = {
         "one": "1",
         "two": "2",
@@ -112,4 +112,3 @@ def extract_programme_choice(user_input: str, map) -> str | None:
             return map.get(number)
 
     return None
-

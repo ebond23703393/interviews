@@ -132,23 +132,39 @@ INTERVIEW_PARAMETERS = {
 		"_name": "social_assistance",
 		"_description": "interview structure to elicite opinions on social assistence programmes",
 		# OPTIONAL FEATURES:
-		"moderate_answers": True,
-		"moderate_questions": True,
+		"moderate_answers": False,
+		"moderate_questions": False,
 		"summarize": True,
 		"max_flags_allowed": 3,
 		# INTERVIEW STRUCTURE:
 		"first_question": "I am interested in learning more about your views on poor people in your country. Can you describe what comes to mind when you think of the poorest in your country?",
+		
 		"interview_plan": [
 			{
 				"topic":"Explore the perceptions that the interviewee has of poor people in their country and understand why they have these perceptions. Do not yet mention social assistance programmes.",
-				"length":1
+				"length":3
                 
 			},
             
+			# {
+			# 	"topic": "Talk with AVA",
+			# 	"length":2,
+			# 	"ava_section": True
+			# },
+            
 			{
-				"topic":"Discuss with the interviewee whether they think that the poor can be helped out of poverty (poverty trap argument), or whether they are inherently lower productivity and will be stuck there for life.",
-				"length":1
+                "topic": "Programme evidence",
+				"length": 2,
+                "type": "image_only",
+				"image_filename": "transfers.png"
+					
 			},
+            
+			{
+				"topic":"Discuss with the interviewee whether they think that the poor can be helped out of poverty (poverty trap argument), or whether they are inherently lower productivity and will be stuck there for life. Only ask one question at a time. Still do not mention social assistance programmes.",
+				"length":2
+			},
+            
             
             
 			{
@@ -166,7 +182,7 @@ INTERVIEW_PARAMETERS = {
             
             {
 				"topic": "Start this topic inidicating which social assistance programme they choose. Explore why they chose the specific programme as the one they support the most. What features of it appeal to them?",
-				"length":2,
+				"length":1,
                 "dynamic_script": "Repeat programme choice"
 			},
             
@@ -174,12 +190,11 @@ INTERVIEW_PARAMETERS = {
             
 			{
 				"topic": "Converse with the interviewee about the effectiveness of the programme they selected.",
-				"length":4,
+				"length":3,
                 #"treatment": "programme_effectiveness",
-                "show_image": True,
-				"image_filename": "transfers.png"
 					
 			},
+            
             
 			{
 				"topic": "Ask the respondent again what their preferred social assistance programme is in light of the evidence, and why?",

@@ -284,12 +284,12 @@ function submitUserMessage() {
                 // Append image if one is provided
                 if (image_url) {
                     var imageWrapper = document.createElement("div");
-                    imageWrapper.style.cssText = "width: 80%; margin-bottom: 10px; display: block; margin-right: auto; text-align: center;";
+                    imageWrapper.style.cssText = "width: 90%; margin-bottom: 10px; display: block; margin-right: auto; text-align: center;";
 
                     var imageElement = document.createElement("img");
                     imageElement.src = image_url;
                     imageElement.alt = "Visual aid";
-                    imageElement.style.cssText = "max-width: 100%; max-height: 250px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);";
+                    imageElement.style.cssText = "max-width: 100%; max-height: 400px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);";
 
                     imageWrapper.appendChild(imageElement);
                     chatArea.appendChild(imageWrapper);
